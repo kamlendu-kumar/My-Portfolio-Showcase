@@ -1,378 +1,195 @@
-/* ===================================================================
-   === FINAL JAVASCRIPT MASTERPIECE (GRAND MASTER AI EDITION) ===
-   =================================================================== */
+/* =========================================
+   === EZSCOPE3 MASTER SCRIPT (GSAP + THREE.JS) ===
+   ========================================= */
 
-document.addEventListener('DOMContentLoaded', function () {
-
-    // --- Master Initializer ---
-    // This function starts everything once the page is ready.
-    function init() {
-        initHeaderScroll();
-        initBceAnimation();
-        initAccordion();
-        initHiwTimeline();
-        initWimTimeline();
-        initCtaAnimation();
-        initFooterShader();
-        // Particles.js is initialized by its own library script but let's ensure it's called
-        initParticles();
-    }
+document.addEventListener('DOMContentLoaded', () => {
     
-    // --- 1. Header Scroll & Active Link Logic ---
-    function initHeaderScroll() {
-        const header = document.getElementById('ezs-showcase-header');
-        const navLinks = document.querySelectorAll('.main-nav a');
-        const sections = document.querySelectorAll('main > *');
+    // --- 1. INITIALIZE LIBRARIES ---
+    initHero3D();
+    initScrollAnimations();
+    initTiltEffect();
+    initChartAnimation();
+    
+    // --- 2. THREE.JS HERO ANIMATION (The "Data Sphere") ---
+    function initHero3D() {
+        const canvas = document.querySelector('#hero-canvas');
+        if (!canvas) return;
 
-        if (!header) return;
+        // Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
 
+        // Create Particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1200;
+        const posArray = new Float32Array(particlesCount * 3);
+
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15; // Spread particles
+        }
+
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+
+        // Material (Blue Glowing Dots)
+        const material = new THREE.PointsMaterial({
+            size: 0.03,
+            color: 0x3b82f6, // Electric Blue
+            transparent: true,
+            opacity: 0.8,
+        });
+
+        // Mesh
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
+
+        // Connecting Lines (Optional for network effect)
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.05 });
+        const linesGeometry = new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(6, 2));
+        const linesMesh = new THREE.LineSegments(linesGeometry, lineMaterial);
+        scene.add(linesMesh);
+
+        // Positioning
+        camera.position.z = 4;
+        
+        // Mouse Interaction
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
+
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
+
+        // Animation Loop
+        const clock = new THREE.Clock();
+
+        function animate() {
+            targetX = mouseX * 0.001;
+            targetY = mouseY * 0.001;
+
+            const elapsedTime = clock.getElapsedTime();
+
+            // Rotate entire system
+            particlesMesh.rotation.y = .1 * elapsedTime;
+            linesMesh.rotation.y = .1 * elapsedTime;
+            linesMesh.rotation.x += 0.05 * (targetY - linesMesh.rotation.x);
+            linesMesh.rotation.y += 0.05 * (targetX - linesMesh.rotation.y);
+
+            // Gentle Wave Motion
+            particlesMesh.rotation.x += 0.001;
+            particlesMesh.rotation.y += 0.001;
+
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
+
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    }
+
+    // --- 3. GSAP SCROLL ANIMATIONS ---
+    function initScrollAnimations() {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Nav Bar Glass Effect on Scroll
+        const nav = document.querySelector('.ez-nav');
         window.addEventListener('scroll', () => {
-            // Header background on scroll
-            if (window.scrollY > 50) {
-                header.classList.add('scrolled');
-            } else {
-                header.classList.remove('scrolled');
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        // Hero Content Reveal
+        const tl = gsap.timeline();
+        tl.from('.ez-badge', { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" })
+          .from('.ez-title', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
+          .from('.ez-subtitle', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
+          .from('.ez-cta-wrapper', { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6");
+
+        // Bento Grid Reveal (Staggered)
+        gsap.from('.bento-card', {
+            scrollTrigger: {
+                trigger: '.bento-grid',
+                start: "top 80%",
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power2.out"
+        });
+
+        // Section Headers
+        gsap.utils.toArray('.ez-section-header').forEach(header => {
+            gsap.from(header, {
+                scrollTrigger: {
+                    trigger: header,
+                    start: "top 85%",
+                },
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                ease: "power2.out"
+            });
+        });
+    }
+
+    // --- 4. VANILLA TILT (3D Card Effect) ---
+    function initTiltEffect() {
+        if (typeof VanillaTilt !== 'undefined') {
+            VanillaTilt.init(document.querySelectorAll(".bento-card"), {
+                max: 10,           // Max tilt rotation (degrees)
+                speed: 400,        // Speed of the enter/exit transition
+                glare: true,       // Add glare effect
+                "max-glare": 0.1,  // Opacity of glare
+                scale: 1.02        // Slight zoom on hover
+            });
+        }
+    }
+
+    // --- 5. DYNAMIC CHART SIMULATION (JS Animation) ---
+    function initChartAnimation() {
+        const chartContainer = document.getElementById('chart-viz');
+        if (!chartContainer) return;
+
+        // Create simple bars
+        for (let i = 0; i < 15; i++) {
+            const bar = document.createElement('div');
+            bar.style.width = '6px';
+            bar.style.backgroundColor = '#3b82f6';
+            bar.style.borderRadius = '4px';
+            bar.style.position = 'absolute';
+            bar.style.bottom = '0';
+            bar.style.left = `${i * 15 + 10}px`;
+            bar.style.height = '10%'; // Initial height
+            bar.style.opacity = '0.7';
+            bar.style.transition = 'height 0.5s ease';
+            chartContainer.appendChild(bar);
+        }
+
+        // Animate Bars Randomly to simulate live data
+        setInterval(() => {
+            const bars = chartContainer.children;
+            for (let bar of bars) {
+                const randomHeight = Math.floor(Math.random() * 80) + 10;
+                bar.style.height = `${randomHeight}%`;
+                // Change color based on height for effect
+                bar.style.backgroundColor = randomHeight > 60 ? '#34D399' : '#3b82f6'; 
             }
-
-            // Active nav link based on scroll position
-            let currentSection = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop - 100;
-                if (window.scrollY >= sectionTop) {
-                    currentSection = section.getAttribute('id');
-                }
-            });
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href') === `#${currentSection}`) {
-                    link.classList.add('active');
-                }
-            });
-        });
+        }, 800);
     }
-
-    // --- 2. Hero Section Particles ---
-    function initParticles() {
-        if (typeof particlesJS !== 'undefined') {
-            particlesJS('particles-js', {
-                "particles": { "number": { "value": 100, "density": { "enable": true, "value_area": 800 } }, "color": { "value": "#ffffff" }, "shape": { "type": "circle" }, "opacity": { "value": 0.5, "random": false, "anim": { "enable": true, "speed": 1, "opacity_min": 0.1, "sync": false } }, "size": { "value": 4, "random": true }, "line_linked": { "enable": true, "distance": 150, "color": "#ffffff", "opacity": 0.3, "width": 1 }, "move": { "enable": true, "speed": 2, "direction": "none", "out_mode": "out" } }, "interactivity": { "detect_on": "canvas", "events": { "onhover": { "enable": true, "mode": "repulse" }, "onclick": { "enable": true, "mode": "push" }, "resize": true }, "modes": { "repulse": { "distance": 120, "duration": 0.4 }, "push": { "particles_nb": 4 } } }, "retina_detect": true
-            });
-        }
-    }
-    
-    // --- 3. BCE Section - Text Animation ---
-    function initBceAnimation() {
-        const bceCard = document.querySelector('.bce-card');
-        if (!bceCard) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting && !entry.target.classList.contains('in-view')) {
-                    entry.target.classList.add('in-view');
-
-                    const heading = entry.target.querySelector('#bce-heading');
-                    const paragraph = entry.target.querySelector('#bce-paragraph');
-
-                    // Animate heading character by character
-                    const headingText = heading.textContent;
-                    heading.innerHTML = '';
-                    headingText.split('').forEach(char => {
-                        const charSpan = document.createElement('span');
-                        charSpan.className = 'char';
-                        charSpan.textContent = char === ' ' ? '\u00A0' : char;
-                        heading.appendChild(charSpan);
-                    });
-                    
-                    const chars = heading.querySelectorAll('.char');
-                    chars.forEach((char, index) => {
-                        setTimeout(() => {
-                            char.style.opacity = '1';
-                            char.style.transform = 'translateY(0)';
-                        }, index * 30);
-                    });
-
-                    // Animate paragraph line by line
-                    const paragraphText = paragraph.innerHTML;
-                    const lines = paragraphText.split('. ');
-                    paragraph.innerHTML = '';
-                    lines.forEach((line, index) => {
-                        if(line.trim() === '') return;
-                        const lineSpan = document.createElement('span');
-                        lineSpan.className = 'line';
-                        lineSpan.textContent = line + (index < lines.length -1 ? '.' : '');
-                        paragraph.appendChild(lineSpan);
-                    });
-
-                    const paraLines = paragraph.querySelectorAll('.line');
-                    paraLines.forEach((line, index) => {
-                        setTimeout(() => {
-                            line.style.opacity = '1';
-                            line.style.transform = 'translateY(0)';
-                        }, (chars.length * 30) + (index * 200));
-                    });
-                    
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.2 });
-
-        observer.observe(bceCard);
-    }
-    
-    // --- 4. Accordion Section ---
-    function initAccordion() {
-        const accordion = document.getElementById('kf-accordion');
-        if (!accordion) return;
-
-        const items = accordion.querySelectorAll('.kf-accordion-item');
-
-        items.forEach(item => {
-            item.querySelector('.kf-accordion-header').addEventListener('click', () => {
-                const isActive = item.classList.contains('active');
-                
-                items.forEach(otherItem => {
-                    otherItem.classList.remove('active');
-                    otherItem.querySelector('.kf-accordion-body').style.maxHeight = null;
-                });
-                
-                if (!isActive) {
-                    item.classList.add('active');
-                    const body = item.querySelector('.kf-accordion-body');
-                    body.style.maxHeight = body.scrollHeight + 'px';
-                }
-            });
-        });
-        
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    setTimeout(() => entry.target.classList.add('in-view'), parseInt(entry.target.dataset.feature || 1) * 100);
-                    observer.unobserve(entry.target);
-                }
-            });
-        }, { threshold: 0.1 });
-
-        items.forEach(item => observer.observe(item));
-    }
-    
-    // --- 5. "How It Works" Timeline ---
-    function initHiwTimeline() {
-        const timelineItems = document.querySelectorAll('.hiw-section-wrapper .timeline-item');
-        const timelineProgress = document.getElementById('timeline-progress');
-        if (!timelineItems.length || !timelineProgress) return;
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add('in-view');
-                }
-            });
-        }, { threshold: 0.2, rootMargin: '0px 0px -100px 0px' });
-
-        timelineItems.forEach(item => observer.observe(item));
-
-        window.addEventListener('scroll', () => {
-            let lastVisibleItem = null;
-            timelineItems.forEach((item, index) => {
-                if (item.classList.contains('in-view')) {
-                    lastVisibleItem = index;
-                }
-            });
-
-            if (lastVisibleItem !== null) {
-                const lastDot = timelineItems[lastVisibleItem].querySelector('.timeline-dot');
-                const newHeight = lastDot.offsetTop + (lastDot.offsetHeight / 2);
-                timelineProgress.style.height = `${newHeight}px`;
-            } else if (window.scrollY < timelineItems[0].offsetTop) {
-                timelineProgress.style.height = `0px`;
-            }
-        });
-    }
-
-    // --- 6. Interactive Demo Timeline ---
-    function initWimTimeline() {
-        const container = document.getElementById('interactive-timeline');
-        if (!container) return;
-        
-        const nodes = container.querySelectorAll('.timeline-node');
-        const contentItems = container.querySelectorAll('.timeline-content-item');
-        const progressLine = document.getElementById('wim-timeline-progress');
-
-        function activateNode(targetNode) {
-            const targetId = targetNode.dataset.target;
-            if (targetNode.classList.contains('active')) return;
-
-            nodes.forEach(n => n.classList.remove('active'));
-            targetNode.classList.add('active');
-
-            contentItems.forEach(c => c.classList.remove('active'));
-            container.querySelector(`.timeline-content-item[data-content="${targetId}"]`).classList.add('active');
-
-            if (window.innerWidth > 900 && progressLine) {
-                const newHeight = targetNode.offsetTop + targetNode.offsetHeight / 2;
-                progressLine.style.height = `${newHeight}px`;
-            }
-        }
-
-        nodes.forEach(node => {
-            node.addEventListener('click', () => activateNode(node));
-        });
-
-        if (window.innerWidth > 900) {
-            const observer = new IntersectionObserver(entries => {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        activateNode(entry.target);
-                    }
-                });
-            }, { root: null, rootMargin: '-45% 0px -45% 0px', threshold: 0 });
-
-            nodes.forEach(node => observer.observe(node));
-        }
-    }
-
-    // --- 7. CTA Section - Cinematic Text & Fluid Background ---
-    function initCtaAnimation() {
-        const headingElement = document.getElementById('cinematic-heading');
-        const container = document.querySelector('.cta-final-wrapper');
-        const canvas = document.getElementById('fluid-canvas');
-        
-        // Cinematic Text Logic
-        if (headingElement && container) {
-            const phrases = [
-                "Visualize Your Data?",
-                "Predict The Future?",
-                "Drive Your Growth?"
-            ];
-            let phraseIndex = 0;
-            let animationTimeout;
-
-            const revealAndLoop = () => {
-                clearTimeout(animationTimeout);
-                const text = phrases[phraseIndex];
-                const words = text.split(' ');
-                headingElement.innerHTML = '';
-                words.forEach(word => {
-                    const wordSpan = document.createElement('span');
-                    wordSpan.className = 'word';
-                    wordSpan.textContent = word;
-                    headingElement.appendChild(wordSpan);
-                });
-                
-                const wordSpans = headingElement.querySelectorAll('.word');
-                wordSpans.forEach((span, index) => {
-                    setTimeout(() => span.classList.add('is-revealed'), index * 200);
-                });
-
-                animationTimeout = setTimeout(() => {
-                    wordSpans.forEach((span, index) => {
-                        setTimeout(() => span.classList.remove('is-revealed'), index * 100);
-                    });
-                    
-                    animationTimeout = setTimeout(() => {
-                        phraseIndex = (phraseIndex + 1) % phrases.length;
-                        revealAndLoop();
-                    }, words.length * 100 + 500);
-
-                }, words.length * 200 + 2500);
-            };
-
-            const observer = new IntersectionObserver((entries) => {
-                if (entries[0].isIntersecting) {
-                    revealAndLoop();
-                    observer.unobserve(container);
-                }
-            }, { threshold: 0.5 });
-            
-            observer.observe(container);
-        }
-
-        // Fluid Background Logic (High Performance)
-        if (canvas) {
-            // This is a complex animation. Using a simplified but effective fluid-like effect.
-            const gl = canvas.getContext('webgl');
-            if(gl) {
-                // For brevity and compatibility, we will skip the full WebGL implementation here.
-                // A full fluid simulation is very code-heavy. This part is a placeholder for that logic.
-                // If you have a specific fluid library, it would be integrated here.
-                // For now, let's make a subtle gradient animation as a fallback.
-                canvas.style.background = 'linear-gradient(45deg, #0f2027, #203a43, #2c5364)';
-                canvas.style.backgroundSize = '400% 400%';
-                canvas.style.animation = 'gradientBG 15s ease infinite';
-                const style = document.createElement('style');
-                style.innerHTML = `@keyframes gradientBG { 0% {background-position: 0% 50%;} 50% {background-position: 100% 50%;} 100% {background-position: 0% 50%;} }`;
-                document.head.appendChild(style);
-            }
-        }
-    }
-
-    // --- 8. Footer Shader ---
-    function initFooterShader() {
-        const shaderCanvas = document.getElementById('shader-canvas');
-        if (!shaderCanvas) return;
-        
-        const gl = shaderCanvas.getContext('webgl');
-        if (!gl) {
-            console.error("WebGL not supported!");
-            return;
-        }
-
-        const vertexShaderSource = `attribute vec2 a_position; void main() { gl_Position = vec4(a_position, 0.0, 1.0); }`;
-        const fragmentShaderSource = `
-        precision highp float;
-        uniform vec2 u_resolution; uniform float u_time; uniform vec2 u_mouse;
-        vec3 palette(float t){vec3 a=vec3(.5,.5,.5);vec3 b=vec3(.5,.5,.5);vec3 c=vec3(1.,1.,1.);vec3 d=vec3(.263,.418,.557);return a+b*cos(6.28318*(c*t+d));}
-        void main(){vec2 uv=(gl_FragCoord.xy*2.-u_resolution.xy)/u_resolution.y;vec2 uv0=uv;vec3 finalColor=vec3(0.);float mouseDist=length(uv-u_mouse*2.+1.);float time=u_time*.1+(.5/(mouseDist+.1))*.3;for(float i=0.;i<4.;i++){uv=fract(uv*1.5)-.5;float d=length(uv)*exp(-length(uv0));vec3 col=palette(length(uv0)+i*.4+time*.4);d=sin(d*8.+time)/8.;d=abs(d);d=pow(.01/d,1.2);finalColor+=col*d;}gl_FragColor=vec4(finalColor,1.);}`;
-
-        function createShader(gl, type, source) {
-            const shader = gl.createShader(type); gl.shaderSource(shader, source); gl.compileShader(shader);
-            return shader;
-        }
-
-        const program = gl.createProgram();
-        gl.attachShader(program, createShader(gl, gl.VERTEX_SHADER, vertexShaderSource));
-        gl.attachShader(program, createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource));
-        gl.linkProgram(program);
-        
-        const positionAttributeLocation = gl.getAttribLocation(program, "a_position");
-        const resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
-        const timeUniformLocation = gl.getUniformLocation(program, "u_time");
-        const mouseUniformLocation = gl.getUniformLocation(program, "u_mouse");
-        
-        const positionBuffer = gl.createBuffer();
-        gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
-        
-        let mousePos = { x: 0.5, y: 0.5 };
-        const footerElement = document.getElementById('ezs-showcase-footer');
-        footerElement.addEventListener('mousemove', (e) => {
-            const rect = shaderCanvas.getBoundingClientRect();
-            mousePos.x = (e.clientX - rect.left) / rect.width;
-            mousePos.y = 1.0 - (e.clientY - rect.top) / rect.height;
-        });
-
-        function render(time) {
-            shaderCanvas.width = shaderCanvas.clientWidth;
-            shaderCanvas.height = shaderCanvas.clientHeight;
-            gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
-
-            gl.useProgram(program);
-            gl.enableVertexAttribArray(positionAttributeLocation);
-            gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-            gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-            
-            gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
-            gl.uniform1f(timeUniformLocation, time * 0.001);
-            gl.uniform2f(mouseUniformLocation, mousePos.x, mousePos.y);
-            
-            gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-            requestAnimationFrame(render);
-        }
-        requestAnimationFrame(render);
-    }
-    
-    // --- Run Everything ---
-    init();
 
 });
