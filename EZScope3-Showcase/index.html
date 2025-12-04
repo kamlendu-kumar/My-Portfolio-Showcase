@@ -3,142 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EZScope3 | B2B SaaS Platform</title>
-    <meta name="description" content="Architected a complete B2B platform using Firebase (Auth & Firestore) and Vanilla JS.">
+    <title>EZScope3 | Future of B2B Analytics</title>
+    <meta name="description" content="A Next-Generation B2B Analytics Platform architected with Firebase and Vanilla JS.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=SF+Pro+Display:wght@400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;800&family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <style>
-        /* =========================================
-           === 1. GLOBAL VARIABLES & RESET ===
-           ========================================= */
-        :root {
-            --bg-dark: #050507;
-            --bg-card: rgba(20, 20, 25, 0.6);
-            --text-main: #ffffff;
-            --text-muted: #a1a1aa;
-            --accent-primary: #3b82f6; /* Electric Blue */
-            --accent-glow: rgba(59, 130, 246, 0.5);
-            --border-light: rgba(255, 255, 255, 0.08);
-            --glass-blur: blur(20px);
-            --font-heading: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-            --font-body: 'Inter', -apple-system, sans-serif;
-        }
-
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-font-smoothing: antialiased; }
-        body { background-color: var(--bg-dark); color: var(--text-main); font-family: var(--font-body); line-height: 1.6; overflow-x: hidden; }
-        html { scroll-behavior: smooth; }
-
-        /* =========================================
-           === 2. NAVIGATION ===
-           ========================================= */
-        .ez-nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 1000; padding: 20px 0; transition: 0.3s ease; }
-        .ez-nav.scrolled { padding: 10px 0; }
-        .ez-nav-content {
-            max-width: 1200px; margin: 0 auto; background: rgba(10, 10, 10, 0.7);
-            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--border-light); padding: 12px 30px; border-radius: 100px;
-            display: flex; justify-content: space-between; align-items: center;
-        }
-        .ez-logo { text-decoration: none; color: white; font-weight: 700; font-family: var(--font-heading); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
-        .logo-icon { width: 24px; height: 24px; background: var(--accent-primary); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
-        .ez-links { display: flex; gap: 30px; }
-        .ez-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.3s; }
-        .ez-links a:hover { color: white; }
-        .ez-btn-small { text-decoration: none; color: white; font-size: 0.85rem; font-weight: 600; border: 1px solid var(--border-light); padding: 8px 16px; border-radius: 20px; transition: 0.3s; }
-        .ez-btn-small:hover { background: white; color: black; }
-
-        /* =========================================
-           === 3. HERO SECTION ===
-           ========================================= */
-        .ez-hero { position: relative; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
-        .ez-hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
-        #hero-canvas { width: 100%; height: 100%; }
-        .ez-hero-content { position: relative; z-index: 2; max-width: 900px; padding: 0 20px; }
-        
-        .ez-badge { display: inline-block; padding: 6px 12px; background: rgba(59, 130, 246, 0.1); color: var(--accent-primary); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 25px; letter-spacing: 1px; text-transform: uppercase; }
-        .ez-title {
-            font-family: var(--font-heading); font-size: clamp(3rem, 6vw, 5.5rem); line-height: 1.1; font-weight: 700;
-            background: linear-gradient(180deg, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 20px; letter-spacing: -2px;
-        }
-        .ez-subtitle { color: var(--text-muted); font-size: clamp(1rem, 2vw, 1.25rem); max-width: 700px; margin: 0 auto 40px auto; }
-        .ez-cta-wrapper { display: flex; justify-content: center; gap: 15px; }
-        .ez-btn-primary { background: var(--accent-primary); color: white; border: none; padding: 14px 32px; border-radius: 30px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 0 20px var(--accent-glow); transition: transform 0.2s, box-shadow 0.2s; }
-        .ez-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--accent-glow); }
-        .ez-btn-secondary { background: transparent; color: white; border: 1px solid var(--border-light); padding: 14px 32px; border-radius: 30px; font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s; }
-        .ez-btn-secondary:hover { background: rgba(255, 255, 255, 0.05); }
-
-        /* =========================================
-           === 4. BENTO GRID ===
-           ========================================= */
-        .ez-bento { padding: 100px 20px; max-width: 1200px; margin: 0 auto; }
-        .ez-section-header { text-align: center; margin-bottom: 60px; }
-        .ez-section-header h2 { font-size: 3rem; font-weight: 700; margin-bottom: 10px; }
-        .ez-section-header p { color: var(--text-muted); font-size: 1.2rem; }
-
-        .bento-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-        .bento-card {
-            background: var(--bg-card); border: 1px solid var(--border-light); border-radius: 24px; padding: 30px;
-            position: relative; overflow: hidden; transition: transform 0.3s ease, border-color 0.3s ease; transform-style: preserve-3d;
-        }
-        .bento-card:hover { border-color: rgba(255, 255, 255, 0.2); }
-        
-        .card-large { grid-column: span 2; background: linear-gradient(145deg, rgba(20,20,25,0.8), rgba(10,10,15,0.9)); }
-        .card-small { grid-column: span 1; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
-        .card-wide { grid-column: span 3; display: flex; align-items: center; justify-content: space-between; padding: 0; background: #0f0f12; }
-
-        .bento-card h3 { font-size: 1.5rem; margin-bottom: 10px; }
-        .bento-card p { color: var(--text-muted); font-size: 0.95rem; }
-        .card-icon { font-size: 2.5rem; margin-bottom: 15px; color: var(--accent-primary); }
-        .viz-placeholder { margin-top: 20px; height: 150px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; position: relative; }
-
-        /* UI Mockup */
-        .card-wide .card-text { padding: 40px; width: 40%; }
-        .ui-mockup { width: 60%; height: 300px; background: #1a1a1d; border-top-left-radius: 20px; border: 1px solid var(--border-light); border-bottom: none; border-right: none; margin-top: 40px; margin-right: 0; box-shadow: -10px -10px 30px rgba(0,0,0,0.5); display: flex; overflow: hidden; }
-        .mock-sidebar { width: 60px; border-right: 1px solid var(--border-light); height: 100%; }
-        .mock-main { flex: 1; padding: 20px; }
-        .mock-graph { height: 100px; background: linear-gradient(90deg, #3b82f6 0%, transparent 100%); opacity: 0.2; border-radius: 8px; margin-bottom: 20px; }
-        .mock-stats { height: 40px; width: 80%; background: rgba(255,255,255,0.05); border-radius: 4px; }
-
-        /* =========================================
-           === 5. TECH SCROLLER ===
-           ========================================= */
-        .ez-tech { padding: 80px 0; background: #000; overflow: hidden; position: relative; border-top: 1px solid var(--border-light); }
-        .tech-content h2 { text-align: center; margin-bottom: 40px; color: var(--text-muted); font-size: 1rem; text-transform: uppercase; letter-spacing: 2px; }
-        .tech-scroller { display: flex; overflow: hidden; user-select: none; }
-        .tech-track { display: flex; gap: 40px; animation: scroll 20s linear infinite; white-space: nowrap; }
-        .tech-track span { font-size: 4rem; font-weight: 800; color: rgba(255, 255, 255, 0.1); text-transform: uppercase; }
-        @keyframes scroll { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-
-        /* =========================================
-           === 6. FOOTER ===
-           ========================================= */
-        .ez-footer { padding: 80px 20px 40px; border-top: 1px solid var(--border-light); background: #050507; }
-        .footer-inner { max-width: 1200px; margin: 0 auto; }
-        .footer-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 60px; padding-bottom: 60px; border-bottom: 1px solid var(--border-light); }
-        .footer-top h2 { font-size: 2.5rem; }
-        .footer-link { color: var(--accent-primary); text-decoration: none; font-size: 1.2rem; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-        .footer-bottom { display: flex; justify-content: space-between; color: var(--text-muted); font-size: 0.9rem; }
-        .socials a { color: var(--text-muted); margin-left: 20px; font-size: 1.2rem; transition: 0.3s; }
-        .socials a:hover { color: white; }
-
-        /* RESPONSIVE */
-        @media (max-width: 900px) {
-            .bento-grid { grid-template-columns: 1fr; }
-            .card-large, .card-small, .card-wide { grid-column: span 1; }
-            .card-wide { flex-direction: column; }
-            .ui-mockup { width: 100%; margin-top: 20px; }
-            .card-wide .card-text { width: 100%; }
-            .footer-top { flex-direction: column; text-align: center; gap: 20px; }
-            .ez-links, .ez-btn-small { display: none; }
-            .ez-nav-content { justify-content: center; }
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -150,7 +24,7 @@
             <div class="ez-links">
                 <a href="#overview">Overview</a>
                 <a href="#tech">Tech Stack</a>
-                <a href="#features">Features</a>
+                <a href="#features">Capabilities</a>
             </div>
             <a href="../index.html" class="ez-btn-small">Back to Portfolio</a>
         </div>
@@ -162,20 +36,20 @@
                 <canvas id="hero-canvas"></canvas>
             </div>
             <div class="ez-hero-content">
-                <span class="ez-badge">Sole Developer Project</span>
-                <h1 class="ez-title">EZScope3: B2B SaaS<br>Architecture.</h1>
-                <p class="ez-subtitle">A high-performance B2B platform architected from scratch using <strong>Firebase (Auth & Firestore)</strong> and <strong>Vanilla JavaScript</strong>.</p>
+                <span class="ez-badge">Enterprise B2B Solution</span>
+                <h1 class="ez-title">Data Intelligence.<br>Reimagined.</h1>
+                <p class="ez-subtitle">A powerful SaaS platform architected for speed and security using <strong>Firebase (Auth & Firestore)</strong> and optimized <strong>Vanilla JavaScript</strong>.</p>
                 <div class="ez-cta-wrapper">
-                    <button class="ez-btn-primary" onclick="window.open('https://kamlendu-kumar.github.io/My-Portfolio-Showcase/EZScope3-Showcase/', '_blank')">View Live Demo</button>
-                    <button class="ez-btn-secondary" onclick="window.open('https://github.com/kamlendu-kumar/My-Portfolio-Showcase/tree/main/EZScope3-Showcase', '_blank')">View Source Code</button>
+                    <a href="https://kamlendu-kumar.github.io/My-Portfolio-Showcase/EZScope3-Showcase/" target="_blank" class="ez-btn-primary">View Live Demo</a>
+                    <a href="https://github.com/kamlendu-kumar/My-Portfolio-Showcase/tree/main/EZScope3-Showcase" target="_blank" class="ez-btn-secondary">View Source Code</a>
                 </div>
             </div>
         </section>
 
         <section class="ez-bento" id="features">
             <div class="ez-section-header">
-                <h2>Designed for Scale.</h2>
-                <p>Engineered dynamic dashboards and survey engines with optimized performance.</p>
+                <h2>Engineered for Scale.</h2>
+                <p>Built with a zero-dependency approach for maximum performance.</p>
             </div>
             
             <div class="bento-grid">
@@ -189,20 +63,20 @@
 
                 <div class="bento-card card-small dark-mode" data-tilt>
                     <div class="card-icon"><i class="fas fa-fire"></i></div>
-                    <h3>Firebase Powered</h3>
-                    <p>Secure Authentication & Firestore Database handling robust user data.</p>
+                    <h3>Firebase Core</h3>
+                    <p>Powered by Firestore NoSQL DB & Authentication.</p>
                 </div>
 
                 <div class="bento-card card-small" data-tilt>
                     <div class="card-icon"><i class="fas fa-poll-h"></i></div>
                     <h3>Survey Engine</h3>
-                    <p>Custom-built multi-step survey portal with state management.</p>
+                    <p>Custom multi-step forms with state management.</p>
                 </div>
 
                 <div class="bento-card card-wide" data-tilt>
                     <div class="card-text">
-                        <h3>Optimized Vanilla JS</h3>
-                        <p>Zero-dependency approach for maximum speed and lightweight architecture.</p>
+                        <h3>Optimized Architecture</h3>
+                        <p>Designed to handle complex B2B logic while maintaining a lightweight frontend footprint.</p>
                     </div>
                     <div class="ui-mockup">
                         <div class="mock-sidebar"></div>
@@ -217,17 +91,18 @@
 
         <section class="ez-tech" id="tech">
             <div class="tech-content">
-                <h2>Technical Stack</h2>
+                <h2>Technology Stack</h2>
                 <div class="tech-scroller">
                     <div class="tech-track">
                         <span>Firebase</span><span>•</span>
                         <span>Firestore</span><span>•</span>
                         <span>Vanilla JS</span><span>•</span>
-                        <span>HTML5/CSS3</span><span>•</span>
+                        <span>HTML5</span><span>•</span>
+                        <span>CSS3</span><span>•</span>
                         <span>Auth</span><span>•</span>
+                        <span>NoSQL</span><span>•</span>
                         <span>SaaS</span><span>•</span>
-                        <span>Firebase</span><span>•</span>
-                        <span>JavaScript</span>
+                        <span>Firebase</span>
                     </div>
                 </div>
             </div>
@@ -236,7 +111,7 @@
         <footer class="ez-footer">
             <div class="footer-inner">
                 <div class="footer-top">
-                    <h2>Interested in the code?</h2>
+                    <h2>Ready to collaborate?</h2>
                     <a href="mailto:kamlendukumar782@gmail.com" class="footer-link">Contact Developer <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="footer-bottom">
@@ -255,115 +130,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            initHero3D();
-            initScrollAnimations();
-            initTiltEffect();
-            initChartAnimation();
-            
-            // --- THREE.JS HERO ---
-            function initHero3D() {
-                const canvas = document.querySelector('#hero-canvas');
-                if (!canvas) return;
-                const scene = new THREE.Scene();
-                const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-                const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
-                renderer.setSize(window.innerWidth, window.innerHeight);
-                renderer.setPixelRatio(window.devicePixelRatio);
-
-                const particlesGeometry = new THREE.BufferGeometry();
-                const particlesCount = 1200;
-                const posArray = new Float32Array(particlesCount * 3);
-                for(let i = 0; i < particlesCount * 3; i++) { posArray[i] = (Math.random() - 0.5) * 15; }
-                particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-                const material = new THREE.PointsMaterial({ size: 0.03, color: 0x3b82f6, transparent: true, opacity: 0.8 });
-                const particlesMesh = new THREE.Points(particlesGeometry, material);
-                scene.add(particlesMesh);
-
-                const lineMaterial = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.05 });
-                const linesGeometry = new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(6, 2));
-                const linesMesh = new THREE.LineSegments(linesGeometry, lineMaterial);
-                scene.add(linesMesh);
-
-                camera.position.z = 4;
-                let mouseX = 0; let mouseY = 0;
-                const windowHalfX = window.innerWidth / 2;
-                const windowHalfY = window.innerHeight / 2;
-                document.addEventListener('mousemove', (event) => {
-                    mouseX = (event.clientX - windowHalfX);
-                    mouseY = (event.clientY - windowHalfY);
-                });
-
-                const clock = new THREE.Clock();
-                function animate() {
-                    const elapsedTime = clock.getElapsedTime();
-                    particlesMesh.rotation.y = .1 * elapsedTime;
-                    linesMesh.rotation.y = .1 * elapsedTime;
-                    linesMesh.rotation.x += 0.05 * ((mouseY * 0.001) - linesMesh.rotation.x);
-                    linesMesh.rotation.y += 0.05 * ((mouseX * 0.001) - linesMesh.rotation.y);
-                    renderer.render(scene, camera);
-                    requestAnimationFrame(animate);
-                }
-                animate();
-                window.addEventListener('resize', () => {
-                    camera.aspect = window.innerWidth / window.innerHeight;
-                    camera.updateProjectionMatrix();
-                    renderer.setSize(window.innerWidth, window.innerHeight);
-                });
-            }
-
-            // --- GSAP ANIMATIONS ---
-            function initScrollAnimations() {
-                gsap.registerPlugin(ScrollTrigger);
-                const nav = document.querySelector('.ez-nav');
-                window.addEventListener('scroll', () => {
-                    if (window.scrollY > 50) nav.classList.add('scrolled');
-                    else nav.classList.remove('scrolled');
-                });
-                
-                const tl = gsap.timeline();
-                tl.from('.ez-badge', { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" })
-                  .from('.ez-title', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
-                  .from('.ez-subtitle', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
-                  .from('.ez-cta-wrapper', { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6");
-
-                gsap.from('.bento-card', {
-                    scrollTrigger: { trigger: '.bento-grid', start: "top 80%" },
-                    y: 50, opacity: 0, duration: 0.8, stagger: 0.1, ease: "power2.out"
-                });
-            }
-
-            // --- TILT EFFECT ---
-            function initTiltEffect() {
-                if (typeof VanillaTilt !== 'undefined') {
-                    VanillaTilt.init(document.querySelectorAll(".bento-card"), {
-                        max: 10, speed: 400, glare: true, "max-glare": 0.1, scale: 1.02
-                    });
-                }
-            }
-
-            // --- CHART ANIMATION ---
-            function initChartAnimation() {
-                const chartContainer = document.getElementById('chart-viz');
-                if (!chartContainer) return;
-                for (let i = 0; i < 15; i++) {
-                    const bar = document.createElement('div');
-                    bar.style.width = '6px'; bar.style.backgroundColor = '#3b82f6'; bar.style.borderRadius = '4px';
-                    bar.style.position = 'absolute'; bar.style.bottom = '0'; bar.style.left = `${i * 15 + 10}px`;
-                    bar.style.height = '10%'; bar.style.opacity = '0.7'; bar.style.transition = 'height 0.5s ease';
-                    chartContainer.appendChild(bar);
-                }
-                setInterval(() => {
-                    const bars = chartContainer.children;
-                    for (let bar of bars) {
-                        const randomHeight = Math.floor(Math.random() * 80) + 10;
-                        bar.style.height = `${randomHeight}%`;
-                        bar.style.backgroundColor = randomHeight > 60 ? '#34D399' : '#3b82f6'; 
-                    }
-                }, 800);
-            }
-        });
-    </script>
+    <script src="script.js"></script>
 </body>
 </html>
