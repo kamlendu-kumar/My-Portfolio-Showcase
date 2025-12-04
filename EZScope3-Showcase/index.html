@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EZScope3 | Future of Data Analytics</title>
-    <meta name="description" content="A Next-Generation B2B Analytics Platform engineered for scale and precision.">
+    <title>EZScope3 | B2B SaaS Platform</title>
+    <meta name="description" content="Architected a complete B2B platform using Firebase (Auth & Firestore) and Vanilla JS.">
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -44,7 +44,7 @@
             border: 1px solid var(--border-light); padding: 12px 30px; border-radius: 100px;
             display: flex; justify-content: space-between; align-items: center;
         }
-        .ez-logo { text-decoration: none; color: white; weight: 700; font-family: var(--font-heading); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
+        .ez-logo { text-decoration: none; color: white; font-weight: 700; font-family: var(--font-heading); font-size: 1.1rem; display: flex; align-items: center; gap: 10px; }
         .logo-icon { width: 24px; height: 24px; background: var(--accent-primary); color: white; border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
         .ez-links { display: flex; gap: 30px; }
         .ez-links a { color: var(--text-muted); text-decoration: none; font-size: 0.9rem; font-weight: 500; transition: color 0.3s; }
@@ -58,7 +58,7 @@
         .ez-hero { position: relative; height: 100vh; width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; overflow: hidden; }
         .ez-hero-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; }
         #hero-canvas { width: 100%; height: 100%; }
-        .ez-hero-content { position: relative; z-index: 2; max-width: 800px; padding: 0 20px; }
+        .ez-hero-content { position: relative; z-index: 2; max-width: 900px; padding: 0 20px; }
         
         .ez-badge { display: inline-block; padding: 6px 12px; background: rgba(59, 130, 246, 0.1); color: var(--accent-primary); border: 1px solid rgba(59, 130, 246, 0.2); border-radius: 20px; font-size: 0.8rem; font-weight: 600; margin-bottom: 25px; letter-spacing: 1px; text-transform: uppercase; }
         .ez-title {
@@ -66,7 +66,7 @@
             background: linear-gradient(180deg, #fff, #a1a1aa); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
             margin-bottom: 20px; letter-spacing: -2px;
         }
-        .ez-subtitle { color: var(--text-muted); font-size: clamp(1rem, 2vw, 1.25rem); max-width: 600px; margin: 0 auto 40px auto; }
+        .ez-subtitle { color: var(--text-muted); font-size: clamp(1rem, 2vw, 1.25rem); max-width: 700px; margin: 0 auto 40px auto; }
         .ez-cta-wrapper { display: flex; justify-content: center; gap: 15px; }
         .ez-btn-primary { background: var(--accent-primary); color: white; border: none; padding: 14px 32px; border-radius: 30px; font-size: 1rem; font-weight: 600; cursor: pointer; box-shadow: 0 0 20px var(--accent-glow); transition: transform 0.2s, box-shadow 0.2s; }
         .ez-btn-primary:hover { transform: translateY(-2px); box-shadow: 0 0 40px var(--accent-glow); }
@@ -149,8 +149,8 @@
             </a>
             <div class="ez-links">
                 <a href="#overview">Overview</a>
-                <a href="#architecture">Architecture</a>
-                <a href="#features">Capabilities</a>
+                <a href="#tech">Tech Stack</a>
+                <a href="#features">Features</a>
             </div>
             <a href="../index.html" class="ez-btn-small">Back to Portfolio</a>
         </div>
@@ -162,47 +162,47 @@
                 <canvas id="hero-canvas"></canvas>
             </div>
             <div class="ez-hero-content">
-                <span class="ez-badge">Enterprise Grade Solution</span>
-                <h1 class="ez-title">Data Intelligence.<br>Reimagined.</h1>
-                <p class="ez-subtitle">Transforming raw chaos into actionable clarity. A B2B SaaS platform architected for speed, security, and scalability.</p>
+                <span class="ez-badge">Sole Developer Project</span>
+                <h1 class="ez-title">EZScope3: B2B SaaS<br>Architecture.</h1>
+                <p class="ez-subtitle">A high-performance B2B platform architected from scratch using <strong>Firebase (Auth & Firestore)</strong> and <strong>Vanilla JavaScript</strong>.</p>
                 <div class="ez-cta-wrapper">
-                    <button class="ez-btn-primary">View Live Demo</button>
-                    <button class="ez-btn-secondary">View Source Code</button>
+                    <button class="ez-btn-primary" onclick="window.open('https://kamlendu-kumar.github.io/My-Portfolio-Showcase/EZScope3-Showcase/', '_blank')">View Live Demo</button>
+                    <button class="ez-btn-secondary" onclick="window.open('https://github.com/kamlendu-kumar/My-Portfolio-Showcase/tree/main/EZScope3-Showcase', '_blank')">View Source Code</button>
                 </div>
             </div>
         </section>
 
         <section class="ez-bento" id="features">
             <div class="ez-section-header">
-                <h2>Engineered for Performance.</h2>
-                <p>Built with a tech stack that refuses to compromise.</p>
+                <h2>Designed for Scale.</h2>
+                <p>Engineered dynamic dashboards and survey engines with optimized performance.</p>
             </div>
             
             <div class="bento-grid">
                 <div class="bento-card card-large" data-tilt>
                     <div class="card-content">
-                        <h3>Real-Time Analytics</h3>
-                        <p>Powered by Firebase Firestore for millisecond-latency data updates.</p>
+                        <h3>Dynamic Dashboards</h3>
+                        <p>Real-time data visualization reflecting user inputs instantly without page reloads.</p>
                         <div class="viz-placeholder" id="chart-viz"></div>
                     </div>
                 </div>
 
                 <div class="bento-card card-small dark-mode" data-tilt>
-                    <div class="card-icon"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Bank-Grade Security</h3>
-                    <p>Role-based access control (RBAC) baked into the core.</p>
+                    <div class="card-icon"><i class="fas fa-fire"></i></div>
+                    <h3>Firebase Powered</h3>
+                    <p>Secure Authentication & Firestore Database handling robust user data.</p>
                 </div>
 
                 <div class="bento-card card-small" data-tilt>
-                    <div class="card-icon"><i class="fas fa-server"></i></div>
-                    <h3>Serverless Architecture</h3>
-                    <p>Scales automatically with traffic spikes using Cloud Functions.</p>
+                    <div class="card-icon"><i class="fas fa-poll-h"></i></div>
+                    <h3>Survey Engine</h3>
+                    <p>Custom-built multi-step survey portal with state management.</p>
                 </div>
 
                 <div class="bento-card card-wide" data-tilt>
                     <div class="card-text">
-                        <h3>Intuitive Dashboard</h3>
-                        <p>A user experience designed to minimize cognitive load while maximizing insight.</p>
+                        <h3>Optimized Vanilla JS</h3>
+                        <p>Zero-dependency approach for maximum speed and lightweight architecture.</p>
                     </div>
                     <div class="ui-mockup">
                         <div class="mock-sidebar"></div>
@@ -215,19 +215,19 @@
             </div>
         </section>
 
-        <section class="ez-tech" id="architecture">
+        <section class="ez-tech" id="tech">
             <div class="tech-content">
-                <h2>The Power Under the Hood</h2>
+                <h2>Technical Stack</h2>
                 <div class="tech-scroller">
                     <div class="tech-track">
-                        <span>React</span><span>•</span>
                         <span>Firebase</span><span>•</span>
-                        <span>Three.js</span><span>•</span>
-                        <span>D3.js</span><span>•</span>
-                        <span>Node.js</span><span>•</span>
-                        <span>TensorFlow</span><span>•</span>
-                        <span>React</span><span>•</span>
-                        <span>Firebase</span>
+                        <span>Firestore</span><span>•</span>
+                        <span>Vanilla JS</span><span>•</span>
+                        <span>HTML5/CSS3</span><span>•</span>
+                        <span>Auth</span><span>•</span>
+                        <span>SaaS</span><span>•</span>
+                        <span>Firebase</span><span>•</span>
+                        <span>JavaScript</span>
                     </div>
                 </div>
             </div>
@@ -236,14 +236,14 @@
         <footer class="ez-footer">
             <div class="footer-inner">
                 <div class="footer-top">
-                    <h2>Ready to scale?</h2>
+                    <h2>Interested in the code?</h2>
                     <a href="mailto:kamlendukumar782@gmail.com" class="footer-link">Contact Developer <i class="fas fa-arrow-right"></i></a>
                 </div>
                 <div class="footer-bottom">
                     <p>&copy; 2025 Kamlendu Kumar. EZScope3 Project Showcase.</p>
                     <div class="socials">
-                        <a href="#"><i class="fab fa-github"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
+                        <a href="https://github.com/kamlendu-kumar" target="_blank"><i class="fab fa-github"></i></a>
+                        <a href="https://linkedin.com/in/kamlendu-kumar" target="_blank"><i class="fab fa-linkedin"></i></a>
                     </div>
                 </div>
             </div>
