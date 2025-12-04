@@ -1,513 +1,195 @@
 /* =========================================
-   === 1. GLOBAL VARIABLES & RESET ===
+   === EZSCOPE3 MASTER SCRIPT (GSAP + THREE.JS) ===
    ========================================= */
-:root {
-    --bg-dark: #050507;
-    --bg-card: rgba(20, 20, 25, 0.6);
-    --text-main: #ffffff;
-    --text-muted: #a1a1aa;
-    --accent-primary: #3b82f6; /* Electric Blue */
-    --accent-glow: rgba(59, 130, 246, 0.5);
-    --border-light: rgba(255, 255, 255, 0.08);
-    --glass-blur: blur(20px);
-    --font-heading: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
-    --font-body: 'Inter', -apple-system, sans-serif;
-}
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
-}
+document.addEventListener('DOMContentLoaded', () => {
+    
+    // --- 1. INITIALIZE LIBRARIES ---
+    initHero3D();
+    initScrollAnimations();
+    initTiltEffect();
+    initChartAnimation();
+    
+    // --- 2. THREE.JS HERO ANIMATION (The "Data Sphere") ---
+    function initHero3D() {
+        const canvas = document.querySelector('#hero-canvas');
+        if (!canvas) return;
 
-body {
-    background-color: var(--bg-dark);
-    color: var(--text-main);
-    font-family: var(--font-body);
-    line-height: 1.6;
-    overflow-x: hidden;
-}
+        // Scene Setup
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas: canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(window.devicePixelRatio);
 
-html {
-    scroll-behavior: smooth;
-}
+        // Create Particles
+        const particlesGeometry = new THREE.BufferGeometry();
+        const particlesCount = 1200;
+        const posArray = new Float32Array(particlesCount * 3);
 
-/* =========================================
-   === 2. NAVIGATION (GLASSMORPHISM) ===
-   ========================================= */
-.ez-nav {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1000;
-    padding: 20px 0;
-    transition: 0.3s ease;
-}
+        for(let i = 0; i < particlesCount * 3; i++) {
+            posArray[i] = (Math.random() - 0.5) * 15; // Spread particles
+        }
 
-.ez-nav.scrolled {
-    padding: 10px 0;
-}
+        particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
 
-.ez-nav-content {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: rgba(10, 10, 10, 0.7);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border: 1px solid var(--border-light);
-    padding: 12px 30px;
-    border-radius: 100px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        // Material (Blue Glowing Dots)
+        const material = new THREE.PointsMaterial({
+            size: 0.03,
+            color: 0x3b82f6, // Electric Blue
+            transparent: true,
+            opacity: 0.8,
+        });
 
-.ez-logo {
-    text-decoration: none;
-    color: white;
-    font-weight: 700;
-    font-family: var(--font-heading);
-    font-size: 1.1rem;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
+        // Mesh
+        const particlesMesh = new THREE.Points(particlesGeometry, material);
+        scene.add(particlesMesh);
 
-.logo-icon {
-    width: 24px;
-    height: 24px;
-    background: var(--accent-primary);
-    color: white;
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-}
+        // Connecting Lines (Optional for network effect)
+        const lineMaterial = new THREE.LineBasicMaterial({ color: 0x3b82f6, transparent: true, opacity: 0.05 });
+        const linesGeometry = new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(6, 2));
+        const linesMesh = new THREE.LineSegments(linesGeometry, lineMaterial);
+        scene.add(linesMesh);
 
-.ez-links {
-    display: flex;
-    gap: 30px;
-}
+        // Positioning
+        camera.position.z = 4;
+        
+        // Mouse Interaction
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
 
-.ez-links a {
-    color: var(--text-muted);
-    text-decoration: none;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: color 0.3s;
-}
+        const windowHalfX = window.innerWidth / 2;
+        const windowHalfY = window.innerHeight / 2;
 
-.ez-links a:hover {
-    color: white;
-}
+        document.addEventListener('mousemove', (event) => {
+            mouseX = (event.clientX - windowHalfX);
+            mouseY = (event.clientY - windowHalfY);
+        });
 
-.ez-btn-small {
-    text-decoration: none;
-    color: white;
-    font-size: 0.85rem;
-    font-weight: 600;
-    border: 1px solid var(--border-light);
-    padding: 8px 16px;
-    border-radius: 20px;
-    transition: 0.3s;
-}
+        // Animation Loop
+        const clock = new THREE.Clock();
 
-.ez-btn-small:hover {
-    background: white;
-    color: black;
-}
+        function animate() {
+            targetX = mouseX * 0.001;
+            targetY = mouseY * 0.001;
 
-/* =========================================
-   === 3. HERO SECTION (CINEMATIC) ===
-   ========================================= */
-.ez-hero {
-    position: relative;
-    height: 100vh;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    overflow: hidden;
-}
+            const elapsedTime = clock.getElapsedTime();
 
-.ez-hero-bg {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 1;
-}
+            // Rotate entire system
+            particlesMesh.rotation.y = .1 * elapsedTime;
+            linesMesh.rotation.y = .1 * elapsedTime;
+            linesMesh.rotation.x += 0.05 * (targetY - linesMesh.rotation.x);
+            linesMesh.rotation.y += 0.05 * (targetX - linesMesh.rotation.y);
 
-#hero-canvas {
-    width: 100%;
-    height: 100%;
-}
+            // Gentle Wave Motion
+            particlesMesh.rotation.x += 0.001;
+            particlesMesh.rotation.y += 0.001;
 
-.ez-hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 900px;
-    padding: 0 20px;
-}
+            renderer.render(scene, camera);
+            requestAnimationFrame(animate);
+        }
+        animate();
 
-.ez-badge {
-    display: inline-block;
-    padding: 6px 12px;
-    background: rgba(59, 130, 246, 0.1);
-    color: var(--accent-primary);
-    border: 1px solid rgba(59, 130, 246, 0.2);
-    border-radius: 20px;
-    font-size: 0.8rem;
-    font-weight: 600;
-    margin-bottom: 25px;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-}
-
-.ez-title {
-    font-family: var(--font-heading);
-    font-size: clamp(3rem, 6vw, 5.5rem);
-    line-height: 1.1;
-    font-weight: 700;
-    background: linear-gradient(180deg, #fff, #a1a1aa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    margin-bottom: 20px;
-    letter-spacing: -2px;
-}
-
-.ez-subtitle {
-    color: var(--text-muted);
-    font-size: clamp(1rem, 2vw, 1.25rem);
-    max-width: 700px;
-    margin: 0 auto 40px auto;
-}
-
-.ez-cta-wrapper {
-    display: flex;
-    justify-content: center;
-    gap: 15px;
-}
-
-.ez-btn-primary {
-    background: var(--accent-primary);
-    color: white;
-    border: none;
-    padding: 14px 32px;
-    border-radius: 30px;
-    font-size: 1rem;
-    font-weight: 600;
-    text-decoration: none;
-    cursor: pointer;
-    box-shadow: 0 0 20px var(--accent-glow);
-    transition: transform 0.2s, box-shadow 0.2s;
-    display: inline-block;
-}
-
-.ez-btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 40px var(--accent-glow);
-}
-
-.ez-btn-secondary {
-    background: transparent;
-    color: white;
-    text-decoration: none;
-    border: 1px solid var(--border-light);
-    padding: 14px 32px;
-    border-radius: 30px;
-    font-size: 1rem;
-    font-weight: 500;
-    cursor: pointer;
-    transition: background 0.2s;
-    display: inline-block;
-}
-
-.ez-btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.05);
-}
-
-/* =========================================
-   === 4. BENTO GRID (APPLE STYLE) ===
-   ========================================= */
-.ez-bento {
-    padding: 100px 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.ez-section-header {
-    text-align: center;
-    margin-bottom: 60px;
-}
-
-.ez-section-header h2 {
-    font-size: 3rem;
-    font-weight: 700;
-    margin-bottom: 10px;
-}
-
-.ez-section-header p {
-    color: var(--text-muted);
-    font-size: 1.2rem;
-}
-
-/* Grid Layout */
-.bento-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: auto auto;
-    gap: 20px;
-}
-
-.bento-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border-light);
-    border-radius: 24px;
-    padding: 30px;
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.3s ease, border-color 0.3s ease;
-    transform-style: preserve-3d;
-}
-
-.bento-card:hover {
-    border-color: rgba(255, 255, 255, 0.2);
-}
-
-/* Specific Card Sizes */
-.card-large {
-    grid-column: span 2;
-    background: linear-gradient(145deg, rgba(20,20,25,0.8), rgba(10,10,15,0.9));
-}
-
-.card-small {
-    grid-column: span 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-}
-
-.card-wide {
-    grid-column: span 3;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0; /* Padding handled inside */
-    background: #0f0f12;
-}
-
-/* Card Content Styling */
-.bento-card h3 {
-    font-size: 1.5rem;
-    margin-bottom: 10px;
-}
-
-.bento-card p {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-}
-
-.card-icon {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    color: var(--accent-primary);
-}
-
-/* Placeholder for JS Animations */
-.viz-placeholder {
-    margin-top: 20px;
-    height: 150px;
-    background: rgba(255, 255, 255, 0.03);
-    border-radius: 12px;
-    position: relative;
-    overflow: hidden;
-}
-
-/* UI Mockup in Wide Card */
-.card-wide .card-text {
-    padding: 40px;
-    width: 40%;
-}
-
-.ui-mockup {
-    width: 60%;
-    height: 300px;
-    background: #1a1a1d;
-    border-top-left-radius: 20px;
-    border: 1px solid var(--border-light);
-    border-bottom: none;
-    border-right: none;
-    margin-top: 40px;
-    margin-right: 0;
-    box-shadow: -10px -10px 30px rgba(0,0,0,0.5);
-    display: flex;
-    overflow: hidden;
-}
-
-.mock-sidebar {
-    width: 60px;
-    border-right: 1px solid var(--border-light);
-    height: 100%;
-}
-
-.mock-main {
-    flex: 1;
-    padding: 20px;
-}
-
-.mock-graph {
-    height: 100px;
-    background: linear-gradient(90deg, #3b82f6 0%, transparent 100%);
-    opacity: 0.2;
-    border-radius: 8px;
-    margin-bottom: 20px;
-}
-
-.mock-stats {
-    height: 40px;
-    width: 80%;
-    background: rgba(255,255,255,0.05);
-    border-radius: 4px;
-}
-
-/* =========================================
-   === 5. TECH SCROLLER (PARALLAX) ===
-   ========================================= */
-.ez-tech {
-    padding: 80px 0;
-    background: #000;
-    overflow: hidden;
-    position: relative;
-    border-top: 1px solid var(--border-light);
-}
-
-.tech-content h2 {
-    text-align: center;
-    margin-bottom: 40px;
-    color: var(--text-muted);
-    font-size: 1rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-}
-
-.tech-scroller {
-    display: flex;
-    overflow: hidden;
-    user-select: none;
-}
-
-.tech-track {
-    display: flex;
-    gap: 40px;
-    animation: scroll 20s linear infinite;
-    white-space: nowrap;
-}
-
-.tech-track span {
-    font-size: 4rem;
-    font-weight: 800;
-    color: rgba(255, 255, 255, 0.1);
-    text-transform: uppercase;
-}
-
-@keyframes scroll {
-    0% { transform: translateX(0); }
-    100% { transform: translateX(-50%); }
-}
-
-/* =========================================
-   === 6. FOOTER ===
-   ========================================= */
-.ez-footer {
-    padding: 80px 20px 40px;
-    border-top: 1px solid var(--border-light);
-    background: #050507;
-}
-
-.footer-inner {
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.footer-top {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 60px;
-    padding-bottom: 60px;
-    border-bottom: 1px solid var(--border-light);
-}
-
-.footer-top h2 {
-    font-size: 2.5rem;
-}
-
-.footer-link {
-    color: var(--accent-primary);
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: 600;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.footer-bottom {
-    display: flex;
-    justify-content: space-between;
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.socials a {
-    color: var(--text-muted);
-    margin-left: 20px;
-    font-size: 1.2rem;
-    transition: 0.3s;
-}
-
-.socials a:hover {
-    color: white;
-}
-
-/* =========================================
-   === 7. RESPONSIVE ===
-   ========================================= */
-@media (max-width: 900px) {
-    .bento-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto;
+        // Handle Resize
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
     }
-    .card-large, .card-small, .card-wide {
-        grid-column: span 1;
+
+    // --- 3. GSAP SCROLL ANIMATIONS ---
+    function initScrollAnimations() {
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Nav Bar Glass Effect on Scroll
+        const nav = document.querySelector('.ez-nav');
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 50) nav.classList.add('scrolled');
+            else nav.classList.remove('scrolled');
+        });
+
+        // Hero Content Reveal
+        const tl = gsap.timeline();
+        tl.from('.ez-badge', { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" })
+          .from('.ez-title', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
+          .from('.ez-subtitle', { y: 30, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6")
+          .from('.ez-cta-wrapper', { y: 20, opacity: 0, duration: 0.8, ease: "power3.out" }, "-=0.6");
+
+        // Bento Grid Reveal (Staggered)
+        gsap.from('.bento-card', {
+            scrollTrigger: {
+                trigger: '.bento-grid',
+                start: "top 80%",
+            },
+            y: 50,
+            opacity: 0,
+            duration: 0.8,
+            stagger: 0.1,
+            ease: "power2.out"
+        });
+
+        // Section Headers
+        gsap.utils.toArray('.ez-section-header').forEach(header => {
+            gsap.from(header, {
+                scrollTrigger: {
+                    trigger: header,
+                    start: "top 85%",
+                },
+                y: 30,
+                opacity: 0,
+                duration: 1,
+                ease: "power2.out"
+            });
+        });
     }
-    .card-wide {
-        flex-direction: column;
+
+    // --- 4. VANILLA TILT (3D Card Effect) ---
+    function initTiltEffect() {
+        if (typeof VanillaTilt !== 'undefined') {
+            VanillaTilt.init(document.querySelectorAll(".bento-card"), {
+                max: 10,           // Max tilt rotation (degrees)
+                speed: 400,        // Speed of the enter/exit transition
+                glare: true,       // Add glare effect
+                "max-glare": 0.1,  // Opacity of glare
+                scale: 1.02        // Slight zoom on hover
+            });
+        }
     }
-    .ui-mockup {
-        width: 100%;
-        margin-top: 20px;
+
+    // --- 5. DYNAMIC CHART SIMULATION (JS Animation) ---
+    function initChartAnimation() {
+        const chartContainer = document.getElementById('chart-viz');
+        if (!chartContainer) return;
+
+        // Create simple bars
+        for (let i = 0; i < 15; i++) {
+            const bar = document.createElement('div');
+            bar.style.width = '6px';
+            bar.style.backgroundColor = '#3b82f6';
+            bar.style.borderRadius = '4px';
+            bar.style.position = 'absolute';
+            bar.style.bottom = '0';
+            bar.style.left = `${i * 15 + 10}px`;
+            bar.style.height = '10%'; // Initial height
+            bar.style.opacity = '0.7';
+            bar.style.transition = 'height 0.5s ease';
+            chartContainer.appendChild(bar);
+        }
+
+        // Animate Bars Randomly to simulate live data
+        setInterval(() => {
+            const bars = chartContainer.children;
+            for (let bar of bars) {
+                const randomHeight = Math.floor(Math.random() * 80) + 10;
+                bar.style.height = `${randomHeight}%`;
+                // Change color based on height for effect
+                bar.style.backgroundColor = randomHeight > 60 ? '#34D399' : '#3b82f6'; 
+            }
+        }, 800);
     }
-    .card-wide .card-text {
-        width: 100%;
-    }
-    .footer-top {
-        flex-direction: column;
-        text-align: center;
-        gap: 20px;
-    }
-    .ez-nav-content {
-        justify-content: center;
-    }
-    .ez-links, .ez-btn-small {
-        display: none; /* Simple mobile nav for now */
-    }
-}
+
+});
