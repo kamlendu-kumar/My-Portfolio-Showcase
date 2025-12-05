@@ -6,11 +6,11 @@
 
 <div align="center">
   <a href="https://github.com/kamlendu-kumar">
-    <img height="160" src="https://github-readme-stats.vercel.app/api?username=kamlendu-kumar&show_icons=true&theme=algolia&hide_border=true" alt="Kamlendu Stats" />
+    <img height="160" src="https://github-readme-stats.vercel.app/api?username=kamlendu-kumar&show_icons=true&theme=algolia&hide_border=true&count_private=true&cache_seconds=3600&v=1" alt="Kamlendu Stats" />
   </a>
   
   <a href="https://github.com/kamlendu-kumar">
-    <img height="160" src="https://github-readme-stats.vercel.app/api/top-langs/?username=kamlendu-kumar&layout=compact&theme=algolia&hide_border=true" alt="Top Languages" />
+    <img height="160" src="https://github-readme-stats.vercel.app/api/top-langs/?username=kamlendu-kumar&layout=compact&theme=algolia&hide_border=true&cache_seconds=3600&v=1" alt="Top Languages" />
   </a>
 </div>
 
